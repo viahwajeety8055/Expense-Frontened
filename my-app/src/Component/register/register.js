@@ -9,6 +9,7 @@ const Register = () => {
   const [nameError, setNameError] = useState("");
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
+  const [errorMessage, setErrorMessage] = useState(null);
 
   const validateName = (name) => {
     if (!name) {
@@ -69,7 +70,12 @@ const Register = () => {
         registerData
       );
     } catch (error) {
-      console.log(error.response.data.message);
+      if (error.response && error.response.status === 401) {
+        const errorResponse = error.response.data.message;
+        setErrorMessage(errorResponse);
+      } else {
+        console.log("Error:", error.message);
+      }
     }
     // Add your registration logic here
     console.log("Registering with:", name, email, password);
@@ -78,6 +84,11 @@ const Register = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <div className="bg-white p-8 rounded shadow-md w-full max-w-md">
+        {errorMessage && (
+          <p className="text-red-500 mt-1 text-center font-bold text-xl">
+            {errorMessage}
+          </p>
+        )}
         <h2 className="text-2xl font-bold mb-4 text-center">Register</h2>
         <form>
           <div className="mb-4">
@@ -150,7 +161,7 @@ const Register = () => {
             type="button"
             className="w-full bg-green-500 text-white py-2 rounded hover:bg-green-600 text-center"
             onClick={handleRegister}
-            to="/login"
+            to={errorMessage !== null ? "/login" : null}
           >
             Register
           </Link>

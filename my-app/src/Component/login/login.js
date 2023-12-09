@@ -7,6 +7,7 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
+  const [errorMessage, setErrorMessage] = useState(null);
 
   const isEmailValid = (email) => {
     // Regular expression for a simple email format validation
@@ -47,13 +48,23 @@ const Login = () => {
       const token = response.data.result.token;
       localStorage.setItem("token", token);
     } catch (error) {
-      console.log(error.response.data.message);
+      if (error.response && error.response.status === 401) {
+        const errorResponse = error.response.data.message;
+        setErrorMessage(errorResponse);
+      } else {
+        console.log("Error:", error.message);
+      }
     }
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <div className="bg-white p-8 rounded shadow-md w-full max-w-md">
+        {errorMessage && (
+          <p className="text-red-500 mt-1 text-center font-bold text-xl">
+            {errorMessage}
+          </p>
+        )}
         <h2 className="text-2xl font-bold mb-4 text-center">Login</h2>
         <form>
           <div className="mb-4">
@@ -104,7 +115,7 @@ const Login = () => {
             type="button"
             className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600 text-center"
             onClick={handleLogin}
-            to={email && password ? "/home" : null}
+            to={errorMessage !== null ? "/home" : null}
           >
             Login
           </Link>

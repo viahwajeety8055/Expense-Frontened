@@ -1,20 +1,8 @@
 import * as React from "react";
 import { BarChart } from "@mui/x-charts/BarChart";
 
+const daysInMonth = 30;
 const currentDate = new Date();
-const daysInMonth = new Date(
-  currentDate.getFullYear(),
-  currentDate.getMonth() + 1,
-  0
-).getDate();
-
-let currentDay = currentDate.getDate();
-const currentMonth = currentDate.getMonth();
-
-let prevMonthDay = currentDay;
-let prevMonth = currentMonth - 1;
-
-console.log(`${currentDay}   ${currentMonth}`);
 
 const xLabels = Array.from(
   { length: daysInMonth },
