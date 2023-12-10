@@ -215,7 +215,11 @@ export default function Home() {
             <p className="text-lg pl-8">{budget ? budget : 0} Rs</p>
           )}
         </div>
-        <div className="w-60 h-28 bg-gray-400 rounded flex flex-col shadow-2xl">
+        <div
+          className={`w-60 h-28 rounded flex flex-col shadow-2xl ${
+            totalExpense > redAlert ? "bg-red-500" : "bg-gray-400"
+          }`}
+        >
           <button
             className="hover:bg-gray-600 text-white mr-4 rounded-md transition duration-300 self-end mt-3 p-1 "
             onClick={
