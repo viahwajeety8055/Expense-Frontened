@@ -70,7 +70,7 @@ const Register = () => {
         registerData
       );
     } catch (error) {
-      if (error.response && error.response.status === 401) {
+      if (error.response) {
         const errorResponse = error.response.data.message;
         setErrorMessage(errorResponse);
       } else {

@@ -75,7 +75,7 @@ export default function Expense({
           ) : (
             <>
               <p className="text-xl font-semibold text-gray-800">{remark}</p>
-              <p className="text-gray-600">${amount}</p>
+              <p className="text-gray-600">₹{amount}</p>
             </>
           )}
         </div>

@@ -6,26 +6,21 @@ const ProfilePage = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
 
-  const handleNameChange = (e) => {
-    setName(e.target.value);
-  };
-
-  const handleEmailChange = (e) => {
-    setEmail(e.target.value);
-  };
-
   const fetchData = async () => {
     try {
       const storedToken = localStorage.getItem("token");
       if (storedToken) {
         const token = jwtDecode(storedToken);
-        const response = await axios.get("", {
-          headers: {
-            Authorization: `${token}`,
-          },
-        });
-        setName(response.data.result.name);
-        setEmail(response.data.result.email);
+        const response = await axios.get(
+          `http://localhost:3000/auth/users/${token.id}`,
+          {
+            headers: {
+              Authorization: `${storedToken}`,
+            },
+          }
+        );
+        setName(response.data.result[0].name);
+        setEmail(response.data.result[0].email);
       }
     } catch (err) {
       console.log(err);
@@ -49,29 +44,14 @@ const ProfilePage = () => {
           <label htmlFor="name" className="block text-gray-600 font-medium">
             Name
           </label>
-          <input
-            type="text"
-            id="name"
-            className="w-full px-3 py-2 border rounded-md"
-            value={name}
-            onChange={handleNameChange}
-          />
+          <p className="w-full px-3 py-2 border rounded-md">{name}</p>
         </div>
         <div className="mb-4">
           <label htmlFor="email" className="block text-gray-600 font-medium">
             Email
           </label>
-          <input
-            type="email"
-            id="email"
-            className="w-full px-3 py-2 border rounded-md"
-            value={email}
-            onChange={handleEmailChange}
-          />
+          <p className="w-full px-3 py-2 border rounded-md">{email}</p>
         </div>
-        <button className="bg-blue-500 text-white font-medium py-2 px-4 rounded-md hover:bg-blue-600 transition duration-300">
-          Save
-        </button>
       </div>
     </div>
   );

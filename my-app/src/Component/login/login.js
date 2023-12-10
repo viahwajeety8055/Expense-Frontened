@@ -8,6 +8,7 @@ const Login = () => {
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [errorMessage, setErrorMessage] = useState(null);
+  const [path, setPath] = useState(false);
 
   const isEmailValid = (email) => {
     // Regular expression for a simple email format validation
@@ -15,10 +16,32 @@ const Login = () => {
     return emailRegex.test(email);
   };
 
+  const login = async (loginData) => {
+    try {
+      const response = await axios.post(
+        "http://localhost:3000/auth/login",
+        loginData
+      );
+      if (response && response.status === 200) {
+        const token = response.data.result.token;
+        localStorage.setItem("token", token);
+        setPath(true);
+      }
+    } catch (error) {
+      if (error.response && error.response.status === 401) {
+        const errorResponse = error.response.data.message;
+        setErrorMessage(errorResponse);
+      } else {
+        console.log("Error:", error.message);
+      }
+    }
+  };
+
   const handleLogin = async () => {
     // Reset previous error messages
     setEmailError("");
     setPasswordError("");
+    setErrorMessage(null);
 
     // Validate email
     if (!email) {
@@ -40,21 +63,7 @@ const Login = () => {
       password: password,
     };
 
-    try {
-      const response = await axios.post(
-        "http://localhost:3000/auth/login",
-        loginData
-      );
-      const token = response.data.result.token;
-      localStorage.setItem("token", token);
-    } catch (error) {
-      if (error.response && error.response.status === 401) {
-        const errorResponse = error.response.data.message;
-        setErrorMessage(errorResponse);
-      } else {
-        console.log("Error:", error.message);
-      }
-    }
+    login(loginData);
   };
 
   return (
@@ -115,7 +124,7 @@ const Login = () => {
             type="button"
             className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600 text-center"
             onClick={handleLogin}
-            to={errorMessage !== null ? "/home" : null}
+            to={path ? "/home" : null}
           >
             Login
           </Link>

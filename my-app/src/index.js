@@ -14,7 +14,7 @@ import NotFoundPage from "./Component/NotFound/notfound";
 import Home from "./Component/Home/home";
 import Login from "./Component/login/login";
 import Register from "./Component/register/register";
-import App from "./App";
+import Budget from "./Component/Budget/budget";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -41,6 +41,10 @@ const router = createBrowserRouter([
   {
     path: "/login",
     element: <Login />,
+  },
+  {
+    path: "/budget",
+    element: <Budget />,
   },
   {
     path: "/register",
