@@ -2,14 +2,14 @@ import React, { useEffect, useState } from "react";
 import Expense from "../Expense/expense";
 import CreateExpense from "../CreateExpense/createExpense";
 import axios from "axios";
-import { jwtDecode } from "jwt-decode";
+import { jwtDecode } from "jwt-decode"; // corrected import
 import RupeeLogo from "../../Asset/rup.jpg";
 
 export default function Home() {
   const [data, setData] = useState([]);
-  const [budget, setBudget] = useState("");
-  const [totalExpense, setTotalExpense] = useState("");
-  const [redAlert, setRedAlert] = useState("");
+  const [budget, setBudget] = useState(null); // changed initial state to null
+  const [totalExpense, setTotalExpense] = useState(null); // changed initial state to null
+  const [redAlert, setRedAlert] = useState(null); // changed initial state to null
   const [budgetId, setBudgetId] = useState("");
   const [showCreateExpense, setShowCreateExpense] = useState(false);
   const storedToken = localStorage.getItem("token");
@@ -23,13 +23,12 @@ export default function Home() {
   }
 
   const fetchBudgetData = async () => {
-    console.log(token);
     try {
       const response = await axios.get(
         `http://localhost:3000/budget/get/${token.id}`,
         {
           headers: {
-            Authorization: `${storedToken}`,
+            Authorization: storedToken, // corrected variable name
           },
         }
       );
@@ -37,7 +36,6 @@ export default function Home() {
       setTotalExpense(response.data.result.totalExpense);
       setRedAlert(response.data.result.redAlert);
       setBudgetId(response.data.result.budgetId);
-      console.log(token);
     } catch (error) {
       console.log(error);
     }
@@ -47,11 +45,9 @@ export default function Home() {
     try {
       const response = await axios.get(`http://localhost:3000/expense`, {
         headers: {
-          Authorization: `${storedToken}`,
+          Authorization: storedToken, // corrected variable name
         },
       });
-      console.log(response.data.result.data);
-
       const modifiedData = response.data.result.data.map((r) => ({
         id: r.id,
         remark: r.reason,
@@ -81,7 +77,7 @@ export default function Home() {
     try {
       const response = await axios.post(
         `http://localhost:3000/expense?amount=${value.amount}&reason=${value.remark}`,
-        expenseData,
+        {},
         {
           headers: {
             Authorization: storedToken,
@@ -91,11 +87,11 @@ export default function Home() {
       expenseData.id = response.data.result.expenseId;
       fetchBudgetData();
       fetchExpenseData();
+      setShowCreateExpense(false);
+      setData([...data, expenseData]);
     } catch (error) {
       console.log(error);
     }
-    setShowCreateExpense(false);
-    setData([...data, expenseData]);
   };
 
   const handleDelete = async (id) => {
@@ -111,9 +107,8 @@ export default function Home() {
       );
 
       if (response.status === 200) {
-        const filteredData = data.filter((d) => d.id !== id);
+        setData((prevData) => prevData.filter((d) => d.id !== id)); // using functional update for setData
         fetchBudgetData();
-        setData(filteredData);
       }
     } catch (error) {
       console.log(error);
@@ -140,18 +135,16 @@ export default function Home() {
     if (key === "BUDGET") {
       updateValueOfBudget();
       setIsEditBudgetMode(false);
-      return;
-    }
-    if (key === "REDALERT") {
+    } else if (key === "REDALERT") {
+      // corrected else if
       updateValueOfBudget();
       setIsEditRedAlertMode(false);
-      return;
     }
   };
 
   const updateValueOfBudget = async () => {
     try {
-      const response = await axios.patch(
+      await axios.patch(
         `http://localhost:3000/budget/update?redAlert=${redAlert}&budget=${budget}`,
         {},
         {
@@ -170,7 +163,7 @@ export default function Home() {
       <div className="flex justify-between items-center">
         <div className="w-60 h-28 bg-gray-400 rounded flex flex-col pt-10 pl-7 shadow-2xl">
           <h4 className="text-xl mt-1 mr-3">Total Expense</h4>
-          <p className="text-lg">{totalExpense ? totalExpense : 0} Rs</p>
+          <p className="text-lg">{totalExpense || 0} Rs</p>
         </div>
         <div className="w-60 h-28 bg-gray-400 rounded flex flex-col shadow-2xl">
           <button
@@ -207,17 +200,19 @@ export default function Home() {
               <input
                 type="text"
                 className="text-xl font-semibold text-gray-800 border-2 border-black mb-2 rounded"
-                value={budget}
+                value={budget || ""}
                 onChange={handleBudget}
               />
             </>
           ) : (
-            <p className="text-lg pl-8">{budget ? budget : 0} Rs</p>
+            <p className="text-lg pl-8">{budget || 0} Rs</p>
           )}
         </div>
         <div
           className={`w-60 h-28 rounded flex flex-col shadow-2xl ${
-            totalExpense > redAlert ? "bg-red-500" : "bg-gray-400"
+            totalExpense && redAlert && totalExpense > redAlert
+              ? "bg-red-500"
+              : "bg-gray-400"
           }`}
         >
           <button
@@ -254,12 +249,12 @@ export default function Home() {
               <input
                 type="text"
                 className="text-xl font-semibold text-gray-800 border-2 border-black mb-2 rounded"
-                value={redAlert}
+                value={redAlert || ""}
                 onChange={handleRedAlert}
               />
             </>
           ) : (
-            <p className="text-lg pl-8">{redAlert ? redAlert : 0} Rs</p>
+            <p className="text-lg pl-8">{redAlert || 0} Rs</p>
           )}
         </div>
       </div>
@@ -279,16 +274,20 @@ export default function Home() {
       )}
       <div>
         <ul className="space-y-4">
-          {data.map((expense, index) => (
-            <Expense
-              key={index}
-              id={expense.id}
-              remark={expense.remark}
-              amount={expense.amount}
-              image={RupeeLogo}
-              onDelete={handleDelete}
-            />
-          ))}
+          {data.map(
+            (
+              expense // removed index from key
+            ) => (
+              <Expense
+                key={expense.id} // changed key to a unique identifier
+                id={expense.id}
+                remark={expense.remark}
+                amount={expense.amount}
+                image={RupeeLogo}
+                onDelete={handleDelete}
+              />
+            )
+          )}
         </ul>
       </div>
     </div>

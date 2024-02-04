@@ -48,6 +48,7 @@ export default function Expense({
 
   const handleDeleteClick = () => {
     onDelete(id);
+    console.log(id);
   };
 
   return (

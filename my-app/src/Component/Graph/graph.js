@@ -24,7 +24,7 @@ export default function SimpleBarChart() {
           },
         }
       );
-      console.log(storedToken);
+      console.log(response.data.result);
       const result = response.data.result.result;
       const label = result.map((d) => {
         const date = new Date(d.date);
